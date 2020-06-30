@@ -95,6 +95,8 @@ class _ChinchiroPlayState extends State<ChinchiroPlay>
           _diceRollNow = false;
           _initAnimationValue();
           _initAnimation();
+          // Dice Roll
+          _diceRoll();
         }
       });
     });
@@ -180,7 +182,6 @@ class _ChinchiroPlayState extends State<ChinchiroPlay>
                         onTap: () {
                           _animationController.forward();
                           _notifyDiceRoll();
-                          _diceRoll();
                         },
                         child: AnimatedContainer(
                             decoration: BoxDecoration(
