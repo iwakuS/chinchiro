@@ -2,16 +2,12 @@ import 'package:chinchiro/modules/chinchiro_play.dart';
 import 'package:flutter/material.dart';
 
 class ChinchiroScreen extends StatefulWidget {
-  ChinchiroScreen({Key key, this.title}) : super(key: key);
-
-  final String title;
-
   @override
   _ChinchiroScreenState createState() => _ChinchiroScreenState();
 }
 
 class _ChinchiroScreenState extends State<ChinchiroScreen> {
-  final _sets = <ChinchiroPlay>[];
+  final _chinchiroSets = <ChinchiroPlay>[];
   int _numberDices = 3;
 
   Widget _buildSetWidgets(List<Widget> dices) {
@@ -26,18 +22,23 @@ class _ChinchiroScreenState extends State<ChinchiroScreen> {
 
   void _createSets() {
     setState(() {
-      _sets.add(ChinchiroPlay(numberDices: _numberDices));
+      _chinchiroSets.add(ChinchiroPlay(numberDices: _numberDices));
     });
   }
 
   void _removeSets() {
     setState(() {
-      _sets.removeAt(_sets.length - 1); //配列の最後尾を削除したい
+      if (_chinchiroSets.isNotEmpty) {
+        _chinchiroSets.removeAt(_chinchiroSets.length - 1); //配列の最後尾を削除
+      }
     });
   }
 
   void _changeNumberDices(int number) {
     setState(() {
+      if ((_numberDices < 2) && number < 0) {
+        return;
+      }
       _numberDices += number;
     });
   }
@@ -53,12 +54,12 @@ class _ChinchiroScreenState extends State<ChinchiroScreen> {
   Widget build(BuildContext context) {
     final gridView = Container(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
-      child: _buildSetWidgets(_sets),
+      child: _buildSetWidgets(_chinchiroSets),
     );
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("チンチロリン"),
+        title: const Text('チンチロリン'),
       ),
       body: gridView,
       persistentFooterButtons: <Widget>[
@@ -66,7 +67,7 @@ class _ChinchiroScreenState extends State<ChinchiroScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              Text("人数：$_sets"),
+              Text('人数：${_chinchiroSets.length}'),
               IconButton(
                 icon: Icon(Icons.add),
                 onPressed: _createSets,
@@ -75,7 +76,7 @@ class _ChinchiroScreenState extends State<ChinchiroScreen> {
                 icon: Icon(Icons.remove),
                 onPressed: _removeSets,
               ),
-              Text("ダイス個数：$_numberDices"),
+              Text('ダイス個数：$_numberDices'),
               IconButton(
                 icon: Icon(Icons.add),
                 onPressed: () => _changeNumberDices(1),

@@ -34,7 +34,7 @@ class _ChinchiroPlayState extends State<ChinchiroPlay>
   // For chinchiro
   List<int> _chinchiroResultList = [];
   int _chinchiroResultNumber;
-  String _chinchiroResult = "チンチロの結果";
+  String _chinchiroResult = 'チンチロの結果';
 
   // For Animation
   AnimationController _animationController;
@@ -57,6 +57,7 @@ class _ChinchiroPlayState extends State<ChinchiroPlay>
     _initAnimation();
   }
 
+  // アニメーションボタン参考：(https://medium.com/flutter-community/animated-send-button-in-flutter-94c1834268b1)
   // For Animation
   void _initAnimationValue() {
     _containerPaddingLeft = 20.0;
@@ -141,22 +142,97 @@ class _ChinchiroPlayState extends State<ChinchiroPlay>
   }
 
   void _chinchiroResultCheck() {
-    _chinchiroResultNumber = _chinchiroResultList[0] * 100 +
-        _chinchiroResultList[1] * 10 +
-        _chinchiroResultList[2];
-    _chinchiroResult = kChinchiroResults[_chinchiroResultNumber];
+    if (widget.numberDices == 3) {
+      _chinchiroResultNumber = _chinchiroResultList[0] * 100 +
+          _chinchiroResultList[1] * 10 +
+          _chinchiroResultList[2];
+      _chinchiroResult = kChinchiroResults[_chinchiroResultNumber];
+    }
   }
 
   void _notifyDiceRoll() {
-//    // 1: icon
-//    setState(() {
-//      _dices.removeRange(0, _dices.length);
-//      _initDices();
-//    });
-//    sleep(Duration(seconds: 1));
-
-    // 2: vibration
     Vibration.vibrate(pattern: [50, 100, 50, 200]);
+  }
+
+  Widget diceRollButton() {
+    return Padding(
+      padding: EdgeInsets.all(0.0),
+      child: Center(
+        child: GestureDetector(
+          onTap: () {
+            _animationController.forward();
+            _notifyDiceRoll();
+          },
+          child: AnimatedContainer(
+            decoration: BoxDecoration(
+              color: _color,
+              borderRadius: BorderRadius.circular(100.0),
+              boxShadow: [
+                BoxShadow(
+                  color: _color,
+                  blurRadius: 21,
+                  spreadRadius: -15,
+                  offset: Offset(
+                    0.0,
+                    20.0,
+                  ),
+                )
+              ],
+            ),
+            padding: EdgeInsets.only(
+              left: _containerPaddingLeft,
+              right: 20.0,
+              top: 10.0,
+              bottom: 10.0,
+            ),
+            duration: Duration(milliseconds: 400),
+            curve: Curves.easeOutCubic,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                (!_diceRollNow)
+                    ? AnimatedContainer(
+                        duration: Duration(milliseconds: 400),
+                        child: Icon(Icons.send),
+                        curve: Curves.fastOutSlowIn,
+                        transform: Matrix4.translationValues(
+                            _translateX, _translateY, 0)
+                          ..rotateZ(_rotate)
+                          ..scale(_scale),
+                      )
+                    : Container(),
+                AnimatedSize(
+                  vsync: this,
+                  duration: Duration(milliseconds: 600),
+                  child: show ? SizedBox(width: 10.0) : Container(),
+                ),
+                AnimatedSize(
+                  vsync: this,
+                  duration: Duration(milliseconds: 200),
+                  child: show ? Text('Dice Roll') : Container(),
+                ),
+                AnimatedSize(
+                  vsync: this,
+                  duration: Duration(milliseconds: 200),
+                  child: _diceRollNow ? Icon(Icons.done) : Container(),
+                ),
+                AnimatedSize(
+                  vsync: this,
+                  alignment: Alignment.topLeft,
+                  duration: Duration(milliseconds: 600),
+                  child: _diceRollNow ? SizedBox(width: 10.0) : Container(),
+                ),
+                AnimatedSize(
+                  vsync: this,
+                  duration: Duration(milliseconds: 200),
+                  child: _diceRollNow ? Text('Done') : Container(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -174,87 +250,8 @@ class _ChinchiroPlayState extends State<ChinchiroPlay>
               child: gridView,
             ),
             const SizedBox(height: 24.0),
-            Text("$_chinchiroResult"),
-            Padding(
-                padding: EdgeInsets.all(0.0),
-                child: Center(
-                    child: GestureDetector(
-                        onTap: () {
-                          _animationController.forward();
-                          _notifyDiceRoll();
-                        },
-                        child: AnimatedContainer(
-                            decoration: BoxDecoration(
-                              color: _color,
-                              borderRadius: BorderRadius.circular(100.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _color,
-                                  blurRadius: 21,
-                                  spreadRadius: -15,
-                                  offset: Offset(
-                                    0.0,
-                                    20.0,
-                                  ),
-                                )
-                              ],
-                            ),
-                            padding: EdgeInsets.only(
-                                left: _containerPaddingLeft,
-                                right: 20.0,
-                                top: 10.0,
-                                bottom: 10.0),
-                            duration: Duration(milliseconds: 400),
-                            curve: Curves.easeOutCubic,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                (!_diceRollNow)
-                                    ? AnimatedContainer(
-                                        duration: Duration(milliseconds: 400),
-                                        child: Icon(Icons.send),
-                                        curve: Curves.fastOutSlowIn,
-                                        transform: Matrix4.translationValues(
-                                            _translateX, _translateY, 0)
-                                          ..rotateZ(_rotate)
-                                          ..scale(_scale),
-                                      )
-                                    : Container(),
-                                AnimatedSize(
-                                  vsync: this,
-                                  duration: Duration(milliseconds: 600),
-                                  child: show
-                                      ? SizedBox(width: 10.0)
-                                      : Container(),
-                                ),
-                                AnimatedSize(
-                                  vsync: this,
-                                  duration: Duration(milliseconds: 200),
-                                  child: show ? Text("Dice Roll") : Container(),
-                                ),
-                                AnimatedSize(
-                                  vsync: this,
-                                  duration: Duration(milliseconds: 200),
-                                  child: _diceRollNow
-                                      ? Icon(Icons.done)
-                                      : Container(),
-                                ),
-                                AnimatedSize(
-                                  vsync: this,
-                                  alignment: Alignment.topLeft,
-                                  duration: Duration(milliseconds: 600),
-                                  child: _diceRollNow
-                                      ? SizedBox(width: 10.0)
-                                      : Container(),
-                                ),
-                                AnimatedSize(
-                                  vsync: this,
-                                  duration: Duration(milliseconds: 200),
-                                  child:
-                                      _diceRollNow ? Text("Done") : Container(),
-                                ),
-                              ],
-                            ))))),
+            Text(widget.numberDices == 3 ? '$_chinchiroResult' : ''),
+            diceRollButton(),
           ],
         ),
       ),
